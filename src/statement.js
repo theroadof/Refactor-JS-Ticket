@@ -40,10 +40,11 @@ function countVolumeCredits(volumeCredits, perf, plays) {
     return volumeCredits;
 }
 
-function getAmountAndCreditsStatement(invoice, plays, result) {
+function getAmountAndCreditsStatement(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
     let performanceNames = [], cost = [], seats = [];
+    let result = `Statement for ${invoice.customer}\n`;
     for (let perf of invoice.performances) {
         totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
         volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
@@ -56,10 +57,10 @@ function getAmountAndCreditsStatement(invoice, plays, result) {
 }
 
 function createStatement(invoice, plays) {
-    let result = `Statement for ${invoice.customer}\n`;
-    result = getAmountAndCreditsStatement(invoice, plays, result).result;
-    result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
-    result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
+
+    let result = getAmountAndCreditsStatement(invoice, plays).result;
+    result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays).totalAmount))}\n`;
+    result += `You earned ${getAmountAndCreditsStatement(invoice, plays).volumeCredits} credits \n`;
     return result;
 }
 
@@ -71,11 +72,11 @@ function createHtmlStatement(invoice, plays) {
     let result = `<h1>Statement for ${invoice.customer}</h1>
 <table>
 <tr><th>play</th><th>seats</th><th>cost</th></tr>`;
-    for (let i = 0; i < getAmountAndCreditsStatement(invoice, plays, result).performanceNames.length; i++) {
-        result += ` <tr><td>${getAmountAndCreditsStatement(invoice, plays, result).performanceNames[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).seats[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).cost[i]}</td></tr>` + '\n'
+    for (let i = 0; i < getAmountAndCreditsStatement(invoice, plays).performanceNames.length; i++) {
+        result += ` <tr><td>${getAmountAndCreditsStatement(invoice, plays).performanceNames[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).seats[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).cost[i]}</td></tr>` + '\n'
     }
-    result += `</table>\n<p>Amount owed is <em>${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}</em></p>\n`;
-    result += `<p>You earned <em>${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits}</em> credits</p>\n`;
+    result += `</table>\n<p>Amount owed is <em>${(usd(getAmountAndCreditsStatement(invoice, plays).totalAmount))}</em></p>\n`;
+    result += `<p>You earned <em>${getAmountAndCreditsStatement(invoice, plays).volumeCredits}</em> credits</p>\n`;
     return result;
 }
 
