@@ -33,6 +33,13 @@ function getPlayFrom(plays, perf) {
   return plays[perf.playID];
 }
 
+function countVolumeCredits(volumeCredits, perf, plays) {
+  volumeCredits += Math.max(perf.audience - 30, 0);
+  // add extra credit for every ten comedy attendees
+  if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
+  return volumeCredits;
+}
+
 function statement(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
@@ -40,10 +47,8 @@ function statement(invoice, plays) {
     for (let perf of invoice.performances) {
         totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
         // add volume credits
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        // add extra credit for every ten comedy attendees
-        if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
-        //print line for this order
+        volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
+      //print line for this order
         result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
     }
     result += `Amount owed is ${(usd(totalAmount))}\n`;
