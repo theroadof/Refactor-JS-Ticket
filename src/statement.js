@@ -53,12 +53,16 @@ function getAmountAndCreditsStatement(invoice, plays, result) {
     return {totalAmount, volumeCredits, result};
 }
 
+function createStatement(invoice, plays) {
+  let result = `Statement for ${invoice.customer}\n`;
+  result = getAmountAndCreditsStatement(invoice, plays, result).result;
+  result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
+  result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
+  return result;
+}
+
 function statement(invoice, plays) {
-    let result = `Statement for ${invoice.customer}\n`;
-    result = getAmountAndCreditsStatement(invoice, plays, result).result;
-    result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
-    result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
-    return result;
+  return createStatement(invoice, plays);
 }
 
 module.exports = {
