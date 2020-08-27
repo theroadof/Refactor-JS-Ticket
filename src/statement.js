@@ -30,37 +30,34 @@ function calculateAmount(perf, play) {
 }
 
 function getPlayFrom(plays, perf) {
-  return plays[perf.playID];
+    return plays[perf.playID];
 }
 
 function countVolumeCredits(volumeCredits, perf, plays) {
-  volumeCredits += Math.max(perf.audience - 30, 0);
-  // add extra credit for every ten comedy attendees
-  if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
-  return volumeCredits;
+    volumeCredits += Math.max(perf.audience - 30, 0);
+    // add extra credit for every ten comedy attendees
+    if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
+    return volumeCredits;
 }
 
 function getAmountAndCreditsStatement(invoice, plays, result) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  for (let perf of invoice.performances) {
-    totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
-    // add volume credits
-    volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
-    //print line for this order
-    result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
-  }
-  return {totalAmount, volumeCredits, result};
+    let totalAmount = 0;
+    let volumeCredits = 0;
+    for (let perf of invoice.performances) {
+        totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
+        // add volume credits
+        volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
+        //print line for this order
+        result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
+    }
+    return {totalAmount, volumeCredits, result};
 }
 
 function statement(invoice, plays) {
     let result = `Statement for ${invoice.customer}\n`;
-  const __ret = getAmountAndCreditsStatement(invoice, plays, result);
-  let totalAmount = __ret.totalAmount;
-  let volumeCredits = __ret.volumeCredits;
-  result = __ret.result;
-  result += `Amount owed is ${(usd(totalAmount))}\n`;
-    result += `You earned ${volumeCredits} credits \n`;
+    result = getAmountAndCreditsStatement(invoice, plays, result).result;
+    result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
+    result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
     return result;
 }
 
