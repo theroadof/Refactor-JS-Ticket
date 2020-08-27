@@ -65,6 +65,11 @@ function statement(invoice, plays) {
   return createStatement(invoice, plays);
 }
 
+function htmlStatement(invoice, plays){
+
+}
+
 module.exports = {
     statement,
+    htmlStatement
 };
