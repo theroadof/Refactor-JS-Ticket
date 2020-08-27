@@ -43,30 +43,44 @@ function countVolumeCredits(volumeCredits, perf, plays) {
 function getAmountAndCreditsStatement(invoice, plays, result) {
     let totalAmount = 0;
     let volumeCredits = 0;
+    let performanceNames = [], cost = [], seats = [];
     for (let perf of invoice.performances) {
         totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
-        // add volume credits
         volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
-        //print line for this order
         result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
+        performanceNames.push(getPlayFrom(plays, perf).name);
+        cost.push((usd(calculateAmount(perf, getPlayFrom(plays, perf)))));
+        seats.push(perf.audience);
     }
-    return {totalAmount, volumeCredits, result};
+    return {totalAmount, volumeCredits, result, performanceNames, cost, seats};
 }
 
 function createStatement(invoice, plays) {
-  let result = `Statement for ${invoice.customer}\n`;
-  result = getAmountAndCreditsStatement(invoice, plays, result).result;
-  result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
-  result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
-  return result;
+    let result = `Statement for ${invoice.customer}\n`;
+    result = getAmountAndCreditsStatement(invoice, plays, result).result;
+    result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}\n`;
+    result += `You earned ${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits} credits \n`;
+    return result;
 }
 
 function statement(invoice, plays) {
-  return createStatement(invoice, plays);
+    return createStatement(invoice, plays);
 }
 
-function htmlStatement(invoice, plays){
+function createHtmlStatement(invoice, plays) {
+    let result = `<h1>Statement for ${invoice.customer}</h1>
+<table>
+<tr><th>play</th><th>seats</th><th>cost</th></tr>`;
+    for (let i = 0; i < getAmountAndCreditsStatement(invoice, plays, result).performanceNames.length; i++) {
+        result += ` <tr><td>${getAmountAndCreditsStatement(invoice, plays, result).performanceNames[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).seats[i]}</td><td>${getAmountAndCreditsStatement(invoice, plays, result).cost[i]}</td></tr>` + '\n'
+    }
+    result += `</table>\n<p>Amount owed is <em>${(usd(getAmountAndCreditsStatement(invoice, plays, result).totalAmount))}</em></p>\n`;
+    result += `<p>You earned <em>${getAmountAndCreditsStatement(invoice, plays, result).volumeCredits}</em> credits</p>\n`;
+    return result;
+}
 
+function htmlStatement(invoice, plays) {
+    return createHtmlStatement(invoice, plays);
 }
 
 module.exports = {
