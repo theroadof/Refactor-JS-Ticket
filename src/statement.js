@@ -29,19 +29,22 @@ function calculateAmount(perf, play) {
     return thisAmount;
 }
 
+function getPlayFrom(plays, perf) {
+  return plays[perf.playID];
+}
+
 function statement(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
     for (let perf of invoice.performances) {
-        const play = plays[perf.playID];
-        totalAmount += calculateAmount(perf, play);
+        totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
         // add volume credits
         volumeCredits += Math.max(perf.audience - 30, 0);
         // add extra credit for every ten comedy attendees
-        if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5);
+        if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
         //print line for this order
-        result += ` ${play.name}: ${(usd(calculateAmount(perf, play)))} (${perf.audience} seats)\n`;
+        result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
     }
     result += `Amount owed is ${(usd(totalAmount))}\n`;
     result += `You earned ${volumeCredits} credits \n`;
