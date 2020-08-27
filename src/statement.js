@@ -35,7 +35,6 @@ function getPlayFrom(plays, perf) {
 
 function countVolumeCredits(volumeCredits, perf, plays) {
     volumeCredits += Math.max(perf.audience - 30, 0);
-    // add extra credit for every ten comedy attendees
     if ('comedy' === getPlayFrom(plays, perf).type) volumeCredits += Math.floor(perf.audience / 5);
     return volumeCredits;
 }
@@ -57,7 +56,6 @@ function getAmountAndCreditsStatement(invoice, plays) {
 }
 
 function createStatement(invoice, plays) {
-
     let result = getAmountAndCreditsStatement(invoice, plays).result;
     result += `Amount owed is ${(usd(getAmountAndCreditsStatement(invoice, plays).totalAmount))}\n`;
     result += `You earned ${getAmountAndCreditsStatement(invoice, plays).volumeCredits} credits \n`;
