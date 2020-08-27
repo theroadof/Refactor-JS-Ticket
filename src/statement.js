@@ -40,18 +40,26 @@ function countVolumeCredits(volumeCredits, perf, plays) {
   return volumeCredits;
 }
 
+function getAmountAndCreditsStatement(invoice, plays, result) {
+  let totalAmount = 0;
+  let volumeCredits = 0;
+  for (let perf of invoice.performances) {
+    totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
+    // add volume credits
+    volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
+    //print line for this order
+    result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
+  }
+  return {totalAmount, volumeCredits, result};
+}
+
 function statement(invoice, plays) {
-    let totalAmount = 0;
-    let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
-    for (let perf of invoice.performances) {
-        totalAmount += calculateAmount(perf, getPlayFrom(plays, perf));
-        // add volume credits
-        volumeCredits = countVolumeCredits(volumeCredits, perf, plays);
-      //print line for this order
-        result += ` ${getPlayFrom(plays, perf).name}: ${(usd(calculateAmount(perf, getPlayFrom(plays, perf))))} (${perf.audience} seats)\n`;
-    }
-    result += `Amount owed is ${(usd(totalAmount))}\n`;
+  const __ret = getAmountAndCreditsStatement(invoice, plays, result);
+  let totalAmount = __ret.totalAmount;
+  let volumeCredits = __ret.volumeCredits;
+  result = __ret.result;
+  result += `Amount owed is ${(usd(totalAmount))}\n`;
     result += `You earned ${volumeCredits} credits \n`;
     return result;
 }
